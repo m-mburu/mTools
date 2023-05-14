@@ -1,0 +1,63 @@
+---
+title: "flat_minimal.Rmd empty"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r development, include=FALSE}
+library(testthat)
+```
+
+<!--
+ You need to run the 'description' chunk in the '0-dev_history.Rmd' file before continuing your code there.
+-->
+
+```{r development-load}
+# Load already included functions if relevant
+pkgload::load_all(export_all = FALSE)
+```
+
+# data_table
+    
+```{r function-data_table}
+#' Title Custom function for datatables 
+#' 
+#' Description A function to produce beautiful tables 
+#' 
+#' @return a an object of class DT
+#' @param df A data frame 
+#' @importFrom DT datatable
+#' @export
+data_table <- function(df){
+    n_col = ncol(df)-1
+    datatable(df,
+              rownames = FALSE,
+              style = "bootstrap4", class = 'cell-border stripe',
+              options = list(scrollX = TRUE,
+                             columnDefs = list(list(className = 'dt-center', targets = 0:n_col))
+              )
+    )
+}
+
+
+```
+  
+```{r example-data_table}
+iris_head  <- head(iris)
+data_table(iris_head)
+```
+  
+```{r tests-data_table}
+test_that("data_table works", {
+  expect_true(inherits(data_table, "function")) 
+})
+```
+  
+
+
+```{r development-inflate, eval=FALSE}
+# Run but keep eval=FALSE to avoid infinite loop
+# Execute in the console directly
+fusen::inflate(flat_file = "dev/flat_minimal.Rmd", vignette_name = "Minimal")
+```
