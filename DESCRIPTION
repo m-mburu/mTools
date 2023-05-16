@@ -8,7 +8,10 @@ Description: A package with a collection of useful functions I normally
     use.
 License: MIT + file LICENSE
 Imports: 
-    DT
+    data.table,
+    DT,
+    openxlsx,
+    stringr
 Suggests: 
     knitr,
     rmarkdown,

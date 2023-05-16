@@ -4,3 +4,4 @@
 ^mTools\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
+^data-raw$

@@ -10,7 +10,7 @@ library(testthat)
 ```
 
 <!--
- You need to run the 'description' chunk in the '0-dev_history.Rmd' file before continuing your code there.
+You need to run the 'description' chunk in the '0-dev_history.Rmd' file before continuing your code there.
 -->
 
 ```{r development-load}
@@ -19,7 +19,7 @@ pkgload::load_all(export_all = FALSE)
 ```
 
 # data_table
-    
+
 ```{r function-data_table}
 #' Title Custom function for datatables 
 #' 
@@ -30,34 +30,196 @@ pkgload::load_all(export_all = FALSE)
 #' @importFrom DT datatable
 #' @export
 data_table <- function(df){
-    n_col = ncol(df)-1
-    datatable(df,
-              rownames = FALSE,
-              style = "bootstrap4", class = 'cell-border stripe',
-              options = list(scrollX = TRUE,
-                             columnDefs = list(list(className = 'dt-center', targets = 0:n_col))
-              )
-    )
+  n_col = ncol(df)-1
+  datatable(df,
+            rownames = FALSE,
+            style = "bootstrap4", class = 'cell-border stripe',
+            options = list(scrollX = TRUE,
+                           columnDefs = list(list(className = 'dt-center', targets = 0:n_col))
+            )
+  )
 }
 
 
 ```
-  
+
+
 ```{r example-data_table}
 iris_head  <- head(iris)
 data_table(iris_head)
 ```
-  
+
+
 ```{r tests-data_table}
 test_that("data_table works", {
   expect_true(inherits(data_table, "function")) 
 })
 ```
+
+# create_save_workbook 
+
+```{r function-create_save_workbook }
+#' Title
+#' 
+#' Description
+
+#' @param list_of_dfs A list of data frames to write to the workbook.
+#' @param path_name The path to the Excel workbook to create.
+#' @param sheet_names A character vector of names for the sheets in the workbook.
+#'
+#' @return The workbook object.
+#'
+#' @importFrom openxlsx createWorkbook addWorksheet writeData saveWorkbook
+#' @importFrom data.table setDF
+#'
+#' @examples
+#' @export
+create_save_workbook  <- function(list_of_dfs, path_name, sheet_names) {
   
+  # Check the input arguments for validity
+  stopifnot(is.list(list_of_dfs) && all(sapply(list_of_dfs, is.data.frame)))
+  stopifnot(is.character(sheet_names))
+  stopifnot("Directory provided does not exists"= dir.exists(path_name))
+  stopifnot("Number of sheets is not equal to number of data frames"= length(list_of_dfs) ==length(sheet_names))
+  # Create the workbook
+  
+  wb <- createWorkbook()
+  
+  # Write the data frames to the workbook
+  lapply(seq_along(list_of_dfs), function(i) {
+    df <- list_of_dfs[[i]]
+    sheet_i <- sheet_names[i]
+    setDF(df)
+    addWorksheet(wb, sheet_i)
+    writeData(wb, sheet_i, df, startCol = 1, startRow = 1)
+  })
+  
+  # Save the workbook
+  saveWorkbook(wb, file = path_name)
+  
+  # Return the workbook object
+  invisible(wb)
+}
+```
+
+
+
+
+```{r example-create_save_workbook }
+df1 <- data.frame(x = 1:10, y = 11:20)
+df2 <- data.frame(a = letters[1:5], b = letters[6:10])
+list_of_dfs <- list(df1, df2)
+
+# Specify the names of the sheets
+sheet_names <- c("Sheet1", "Sheet2")
+
+# Create the workbook
+path_name <- tempfile(pattern = "create_work_book",  fileext = ".xlsx")
+create_save_workbook(list_of_dfs, path_name, sheet_names)
+```
+
+
+
+```{r tests-create_save_workbook }
+test_that("create_save_workbook() creates a workbook with the specified sheets", {
+  
+  
+  # Create a list of data frames
+  df1 <- data.frame(x = 1:10, y = 11:20)
+  df2 <- data.frame(a = letters[1:5], b = letters[6:10])
+  list_of_dfs <- list(df1, df2)
+  
+  # Specify the names of the sheets
+  sheet_names <- c("Sheet1", "Sheet2")
+  
+  # Create the workbook
+  path_name = file.path("inst", "extdata", "test.xlsx" )
+  file.remove(path_name)
+  create_save_workbook(list_of_dfs, path_name , sheet_names)
+  
+  expect_error( create_save_workbook(list_of_dfs, path_name="some/path/name" , sheet_names),
+                regexp = "Directory provided does not exists" )
+  
+  expect_error( create_save_workbook(list_of_dfs, path_name , sheet_names[1]),
+                regexp = "Number of sheets is not equal to number of data frames" )
+  # Check that the workbook exists
+  path_name <- system.file("extdata",
+                           "test.xlsx",
+                           package = "mTools")
+  
+  expect_true(file.exists(path_name))
+  
+  # Open the workbook and check that the sheets have the correct data
+  library(openxlsx)
+  wb <- loadWorkbook(path_name)
+  expect_equal(read.xlsx(wb, "Sheet1"), df1)
+  expect_equal(read.xlsx(wb, "Sheet2"), df2)
+})
+```
+
+
+# collapse_vec
+
+```{r function-collapse_vec}
+#' Title  Collapse a vector into a string, separated by a pipe character (|).
+#' 
+#' Description  Collapse a vector into a string, separated by a pipe character (|).
+#' 
+#' @param x A vector.
+#' @importFrom stringr str_trim
+#' @return A string.
+#'
+#' @export
+
+
+collapse_vec <- function(x) {
+  x |>
+    str_trim() |>
+    paste0(collapse = "|")
+} 
+
+```
+
+
+```{r example-collapse_vec}
+x <- c("a", "b", "c")
+collapse_vec(x)
+```
+
+
+```{r tests-collapse_vec}
+library(testthat)
+
+test_that("collapse_vec() collapses a vector into a string, separated by a pipe character (|)", {
+  # Create a vector
+  x <- c("a", "b", "c")
+  
+  # Check the output
+  expect_equal(collapse_vec(x), "a|b|c")
+})
+
+test_that("collapse_vec() returns a string", {
+  # Create a vector
+  x <- c("a", "b", "c")
+  
+  # Check the output type
+  expect_is(collapse_vec(x), "character")
+})
+
+test_that("collapse_vec() works with empty vectors", {
+  # Create an empty vector
+  x <- c()
+  
+  # Check the output
+  expect_equal(collapse_vec(x), "")
+})
+```
+
 
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
-fusen::inflate(flat_file = "dev/flat_minimal.Rmd", vignette_name = "Minimal")
+fusen::inflate(flat_file = "dev/flat_minimal.Rmd", 
+               vignette_name = "Minimal")
 ```

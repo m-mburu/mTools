@@ -12,14 +12,14 @@
 #' iris_head  <- head(iris)
 #' data_table(iris_head)
 data_table <- function(df){
-    n_col = ncol(df)-1
-    datatable(df,
-              rownames = FALSE,
-              style = "bootstrap4", class = 'cell-border stripe',
-              options = list(scrollX = TRUE,
-                             columnDefs = list(list(className = 'dt-center', targets = 0:n_col))
-              )
-    )
+  n_col = ncol(df)-1
+  datatable(df,
+            rownames = FALSE,
+            style = "bootstrap4", class = 'cell-border stripe',
+            options = list(scrollX = TRUE,
+                           columnDefs = list(list(className = 'dt-center', targets = 0:n_col))
+            )
+  )
 }
 
 
