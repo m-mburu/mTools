@@ -12,9 +12,18 @@ test_that("create_save_workbook() creates a workbook with the specified sheets",
   sheet_names <- c("Sheet1", "Sheet2")
   
   # Create the workbook
-  path_name = file.path("inst", "extdata", "test.xlsx" )
-  file.remove(path_name)
-  create_save_workbook(list_of_dfs, path_name , sheet_names)
+  #create temporary folder 
+  path_name <- tempfile(pattern = "create_work_book") |>
+    normalizePath(winslash = "/")
+  
+  dir.create(path_name)
+  
+  # create file name
+  path_name <- file.path(path_name, "test.xlsx")
+  
+  create_save_workbook(list_of_dfs, 
+                       path_name ,
+                       sheet_names)
   
   expect_error( create_save_workbook(list_of_dfs, path_name="some/path/name" , sheet_names),
                 regexp = "Directory provided does not exists" )
@@ -22,9 +31,7 @@ test_that("create_save_workbook() creates a workbook with the specified sheets",
   expect_error( create_save_workbook(list_of_dfs, path_name , sheet_names[1]),
                 regexp = "Number of sheets is not equal to number of data frames" )
   # Check that the workbook exists
-  path_name <- system.file("extdata",
-                           "test.xlsx",
-                           package = "mTools")
+
   
   expect_true(file.exists(path_name))
   

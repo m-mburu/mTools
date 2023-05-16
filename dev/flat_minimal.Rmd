@@ -79,7 +79,7 @@ create_save_workbook  <- function(list_of_dfs, path_name, sheet_names) {
   # Check the input arguments for validity
   stopifnot(is.list(list_of_dfs) && all(sapply(list_of_dfs, is.data.frame)))
   stopifnot(is.character(sheet_names))
-  stopifnot("Directory provided does not exists"= dir.exists(path_name))
+  stopifnot("Directory provided does not exists"= dir.exists(dirname(path_name)))
   stopifnot("Number of sheets is not equal to number of data frames"= length(list_of_dfs) ==length(sheet_names))
   # Create the workbook
   
@@ -113,9 +113,21 @@ list_of_dfs <- list(df1, df2)
 # Specify the names of the sheets
 sheet_names <- c("Sheet1", "Sheet2")
 
+#create temporary folder 
+path_name <- tempfile(pattern = "create_work_book") |>
+  normalizePath(winslash = "/")
+
+dir.create(path_name)
+
+# create file name
+file_name <- file.path(path_name, "test.xlsx")
+
 # Create the workbook
-path_name <- tempfile(pattern = "create_work_book",  fileext = ".xlsx")
-create_save_workbook(list_of_dfs, path_name, sheet_names)
+create_save_workbook(list_of_dfs,
+                     path_name = file_name, 
+                     sheet_names)
+file.remove(file_name)
+unlink(path_name)
 ```
 
 
@@ -133,9 +145,18 @@ test_that("create_save_workbook() creates a workbook with the specified sheets",
   sheet_names <- c("Sheet1", "Sheet2")
   
   # Create the workbook
-  path_name = file.path("inst", "extdata", "test.xlsx" )
-  file.remove(path_name)
-  create_save_workbook(list_of_dfs, path_name , sheet_names)
+  #create temporary folder 
+  path_name <- tempfile(pattern = "create_work_book") |>
+    normalizePath(winslash = "/")
+  
+  dir.create(path_name)
+  
+  # create file name
+  path_name <- file.path(path_name, "test.xlsx")
+  
+  create_save_workbook(list_of_dfs, 
+                       path_name ,
+                       sheet_names)
   
   expect_error( create_save_workbook(list_of_dfs, path_name="some/path/name" , sheet_names),
                 regexp = "Directory provided does not exists" )
@@ -143,9 +164,7 @@ test_that("create_save_workbook() creates a workbook with the specified sheets",
   expect_error( create_save_workbook(list_of_dfs, path_name , sheet_names[1]),
                 regexp = "Number of sheets is not equal to number of data frames" )
   # Check that the workbook exists
-  path_name <- system.file("extdata",
-                           "test.xlsx",
-                           package = "mTools")
+
   
   expect_true(file.exists(path_name))
   
@@ -166,16 +185,21 @@ test_that("create_save_workbook() creates a workbook with the specified sheets",
 #' Description  Collapse a vector into a string, separated by a pipe character (|).
 #' 
 #' @param x A vector.
+#' @param separator_char A character vector eg -, | use as a separator
 #' @importFrom stringr str_trim
 #' @return A string.
 #'
 #' @export
 
 
-collapse_vec <- function(x) {
+collapse_vec <- function(x, separator_char =  NULL ) {
+  if(is.null(separator_char)){
+    
+    separator_char = "|"
+  }
   x |>
     str_trim() |>
-    paste0(collapse = "|")
+    paste0(collapse = separator_char )
 } 
 
 ```

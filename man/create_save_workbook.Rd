@@ -27,8 +27,19 @@ list_of_dfs <- list(df1, df2)
 # Specify the names of the sheets
 sheet_names <- c("Sheet1", "Sheet2")
 
+#create temporary folder 
+path_name <- tempfile(pattern = "create_work_book") |>
+  normalizePath(winslash = "/")
+
+dir.create(path_name)
+
+# create file name
+file_name <- file.path(path_name, "test.xlsx")
+
 # Create the workbook
-my_temp_folder <- tempfile(pattern = "create_work_book")
-path_name = file.path(my_temp_folder,"test.xlsx" )
-create_save_workbook(list_of_dfs, path_name, sheet_names)
+create_save_workbook(list_of_dfs,
+                     path_name = file_name, 
+                     sheet_names)
+file.remove(file_name)
+unlink(path_name)
 }

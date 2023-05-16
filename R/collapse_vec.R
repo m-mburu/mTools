@@ -5,6 +5,7 @@
 #' Description  Collapse a vector into a string, separated by a pipe character (|).
 #' 
 #' @param x A vector.
+#' @param separator_char A character vector eg -, | use as a separator
 #' @importFrom stringr str_trim
 #' @return A string.
 #'
@@ -14,9 +15,13 @@
 #' @examples
 #' x <- c("a", "b", "c")
 #' collapse_vec(x)
-collapse_vec <- function(x) {
+collapse_vec <- function(x, separator_char =  NULL ) {
+  if(is.null(separator_char)){
+    
+    separator_char = "|"
+  }
   x |>
     str_trim() |>
-    paste0(collapse = "|")
+    paste0(collapse = separator_char )
 } 
 

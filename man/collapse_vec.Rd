@@ -4,10 +4,12 @@
 \alias{collapse_vec}
 \title{Title  Collapse a vector into a string, separated by a pipe character (|).}
 \usage{
-collapse_vec(x)
+collapse_vec(x, separator_char = NULL)
 }
 \arguments{
 \item{x}{A vector.}
+
+\item{separator_char}{A character vector eg -, | use as a separator}
 }
 \value{
 A string.
