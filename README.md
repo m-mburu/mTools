@@ -18,15 +18,38 @@ You can install the development version of mTools from
 devtools::install_github("m-mburu/mTools")
 ```
 
+## load package
+
+``` r
+library(mTools)
+```
+
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-library(mTools)
+
 iris_head  <- head(iris)
 data_table(iris_head)
 ```
 
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-e35a3b9544566b19ac18" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e35a3b9544566b19ac18">{"x":{"style":"bootstrap4","filter":"none","vertical":false,"data":[[5.1,4.9,4.7,4.6,5,5.4],[3.5,3,3.2,3.1,3.6,3.9],[1.4,1.4,1.3,1.5,1.4,1.7],[0.2,0.2,0.2,0.2,0.2,0.4],["setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"<table class=\"table table-bordered table-striped\">\n  <thead>\n    <tr>\n      <th>Sepal.Length<\/th>\n      <th>Sepal.Width<\/th>\n      <th>Petal.Length<\/th>\n      <th>Petal.Width<\/th>\n      <th>Species<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"columnDefs":[{"className":"dt-center","targets":[0,1,2,3,4]}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+## Produce nice Rmarkdowns tables from model objects
+
+``` r
+library(MASS)
+data(anorexia)
+
+anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
+                family = gaussian, data = anorexia)
+
+library(knitr)
+DT_tidy_model(anorex.1, output_function = "kable")
+```
+
+| term        | estimate | std.error | statistic | p.value |
+|:------------|---------:|----------:|----------:|--------:|
+| (Intercept) |  49.7711 |   13.3910 |    3.7168 |  0.0004 |
+| Prewt       |  -0.5655 |    0.1612 |   -3.5087 |  0.0008 |
+| TreatCont   |  -4.0971 |    1.8935 |   -2.1638 |  0.0340 |
+| TreatFT     |   4.5631 |    2.1333 |    2.1389 |  0.0360 |

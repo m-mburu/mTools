@@ -66,3 +66,26 @@ x <- c("a", "b", "c")
 collapse_vec(x)
 ```
 
+# DT_tidy_model
+
+    
+
+  
+
+```{r example-DT_tidy_model}
+## model from glm examples
+library(MASS)
+data(anorexia)
+
+anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
+                family = gaussian, data = anorexia)
+
+
+DT_tidy_model(anorex.1)
+```
+
+  
+
+  
+
+

@@ -8,12 +8,15 @@ Description: A package with a collection of useful functions I normally
     use.
 License: MIT + file LICENSE
 Imports: 
+    broom,
     data.table,
     DT,
+    magrittr,
     openxlsx,
     stringr
 Suggests: 
     knitr,
+    MASS,
     rmarkdown,
     testthat
 VignetteBuilder: 

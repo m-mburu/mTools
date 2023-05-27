@@ -239,7 +239,63 @@ test_that("collapse_vec() works with empty vectors", {
 })
 ```
 
+# DT_tidy_model
+    
+```{r function-DT_tidy_model}
+#' Title  Produce a nice data table from tidy model object
+#' Description This function takes a tidy model object and converts it into a formatted data table. It can use custome function eg knitr kable
+#' @param model The tidy model object.
+#' @param round_digts An integer specifying the number of digits to round the numeric columns. Default is 4.
+#' @param output_function A string specifying the output function to use. Default is "data_table".
+#'
+#' @importFrom broom tidy
+#' @importFrom data.table setDT
+#' @importFrom data.table setDF
+#'
+#' @return An object of class DT, representing the formatted data table.
+#'
+#' @export
+DT_tidy_model <- function(model, round_digts = 4, output_function = "data_table") {
 
+  # Get the tidy model object
+  tidy_model <- tidy(model)
+
+  # Convert the tidy model object to a data.table
+  setDT(tidy_model)
+
+  # Get the names of the numeric columns
+  num_nms <- tidy_model[, .SD, .SDcols = is.numeric] |>
+    names()
+
+  # Round the numeric columns to the specified number of digits
+  tidy_model[, (num_nms) := lapply(.SD, round, digits = round_digts), .SDcols = is.numeric]
+
+  # Return the data.table
+  output_function_matched  =  match.fun(output_function)
+
+  output_function_matched(tidy_model)
+}
+
+```
+  
+```{r example-DT_tidy_model}
+## model from glm examples
+library(MASS)
+data(anorexia)
+
+anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
+                family = gaussian, data = anorexia)
+
+
+DT_tidy_model(anorex.1)
+```
+  
+```{r tests-DT_tidy_model}
+test_that("DT_tidy_model works", {
+  expect_true(inherits(DT_tidy_model, "function")) 
+})
+```
+  
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop

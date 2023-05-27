@@ -29,14 +29,32 @@ You can install the development version of mTools from [GitHub](https://github.c
 # install.packages("devtools")
 devtools::install_github("m-mburu/mTools")
 ```
+## load package
+
+```{r}
+library(mTools)
+```
 
 ## Example
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example}
-library(mTools)
+```{r example, eval=FALSE}
+
 iris_head  <- head(iris)
 data_table(iris_head)
+```
+
+## Produce nice Rmarkdowns tables from model objects
+
+```{r}
+library(MASS)
+data(anorexia)
+
+anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
+                family = gaussian, data = anorexia)
+
+library(knitr)
+DT_tidy_model(anorex.1, output_function = "kable")
 ```
 
