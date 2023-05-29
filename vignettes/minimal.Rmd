@@ -66,6 +66,21 @@ x <- c("a", "b", "c")
 collapse_vec(x)
 ```
 
+# round_all_num_cols
+
+    
+
+  
+
+```{r example-round_all_num_cols}
+round_all_num_cols(iris) %>%
+  head()
+```
+
+  
+
+  
+
 # DT_tidy_model
 
     
@@ -76,7 +91,7 @@ collapse_vec(x)
 ## model from glm examples
 library(MASS)
 data(anorexia)
-
+library(broom)
 anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
                 family = gaussian, data = anorexia)
 

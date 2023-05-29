@@ -5,12 +5,19 @@
 \title{Title  Produce a nice data table from tidy model object
 Description This function takes a tidy model object and converts it into a formatted data table. It can use custome function eg knitr kable}
 \usage{
-DT_tidy_model(model, round_digts = 4, output_function = "data_table")
+DT_tidy_model(
+  model,
+  round_digts = 4,
+  tidy_function = "tidy",
+  output_function = "data_table"
+)
 }
 \arguments{
 \item{model}{The tidy model object.}
 
 \item{round_digts}{An integer specifying the number of digits to round the numeric columns. Default is 4.}
+
+\item{tidy_function}{a function that returns tibble, data frame from a model object eg tidy, glance functions from broom}
 
 \item{output_function}{A string specifying the output function to use. Default is "data_table".}
 }
@@ -25,7 +32,7 @@ Description This function takes a tidy model object and converts it into a forma
 ## model from glm examples
 library(MASS)
 data(anorexia)
-
+library(broom)
 anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
                 family = gaussian, data = anorexia)
 

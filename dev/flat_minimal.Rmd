@@ -239,6 +239,48 @@ test_that("collapse_vec() works with empty vectors", {
 })
 ```
 
+# round_all_num_cols
+    
+```{r function-round_all_num_cols}
+#' Title Round all numeric columns to specified digits
+#'
+#' Description A function to round all numeric columns of a data frame
+#'
+#' @param df A data frame
+#' @importFrom data.table setDT
+#' @param round_digits  The number of digits to round to
+#'
+#' @return A data frame with all numeric columns rounded to the specified number of digits
+#'
+#' @export
+round_all_num_cols <- function(df, round_digits = 2) {
+
+  # Convert the data frame to a data.table
+  setDT(df)
+
+  # Get the names of the numeric columns
+  num_cols <- df[, .SD, .SDcols = is.numeric] %>%
+    names()
+
+  # Round the numeric columns to the specified number of digits
+  df[, (num_cols) := lapply(.SD, round, digits = round_digits), .SDcols = num_cols]
+
+  # Return the data.table
+  df
+}
+```
+  
+```{r example-round_all_num_cols}
+round_all_num_cols(iris) %>%
+  head()
+```
+  
+```{r tests-round_all_num_cols}
+test_that("round_all_num_cols works", {
+  expect_true(inherits(round_all_num_cols, "function")) 
+})
+```
+  
 # DT_tidy_model
     
 ```{r function-DT_tidy_model}
@@ -247,7 +289,7 @@ test_that("collapse_vec() works with empty vectors", {
 #' @param model The tidy model object.
 #' @param round_digts An integer specifying the number of digits to round the numeric columns. Default is 4.
 #' @param output_function A string specifying the output function to use. Default is "data_table".
-#'
+#' @param tidy_function a function that returns tibble, data frame from a model object eg tidy, glance functions from broom 
 #' @importFrom broom tidy
 #' @importFrom data.table setDT
 #' @importFrom data.table setDF
@@ -255,10 +297,11 @@ test_that("collapse_vec() works with empty vectors", {
 #' @return An object of class DT, representing the formatted data table.
 #'
 #' @export
-DT_tidy_model <- function(model, round_digts = 4, output_function = "data_table") {
+DT_tidy_model <- function(model, round_digts = 4,tidy_function = "tidy", output_function = "data_table") {
 
   # Get the tidy model object
-  tidy_model <- tidy(model)
+  tidy_function_matched  =  match.fun(tidy_function)
+  tidy_model <- tidy_function_matched(model)
 
   # Convert the tidy model object to a data.table
   setDT(tidy_model)
@@ -268,7 +311,8 @@ DT_tidy_model <- function(model, round_digts = 4, output_function = "data_table"
     names()
 
   # Round the numeric columns to the specified number of digits
-  tidy_model[, (num_nms) := lapply(.SD, round, digits = round_digts), .SDcols = is.numeric]
+  round_all_num_cols(tidy_model, round_digits = round_digts)
+  #tidy_model[, (num_nms) := lapply(.SD, round, digits = round_digts), .SDcols = is.numeric]
 
   # Return the data.table
   output_function_matched  =  match.fun(output_function)
@@ -282,7 +326,7 @@ DT_tidy_model <- function(model, round_digts = 4, output_function = "data_table"
 ## model from glm examples
 library(MASS)
 data(anorexia)
-
+library(broom)
 anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
                 family = gaussian, data = anorexia)
 

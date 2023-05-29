@@ -5,7 +5,7 @@
 #' @param model The tidy model object.
 #' @param round_digts An integer specifying the number of digits to round the numeric columns. Default is 4.
 #' @param output_function A string specifying the output function to use. Default is "data_table".
-#'
+#' @param tidy_function a function that returns tibble, data frame from a model object eg tidy, glance functions from broom 
 #' @importFrom broom tidy
 #' @importFrom data.table setDT
 #' @importFrom data.table setDF
@@ -17,16 +17,17 @@
 #' ## model from glm examples
 #' library(MASS)
 #' data(anorexia)
-#' 
+#' library(broom)
 #' anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
 #'                 family = gaussian, data = anorexia)
 #' 
 #' 
 #' DT_tidy_model(anorex.1)
-DT_tidy_model <- function(model, round_digts = 4, output_function = "data_table") {
+DT_tidy_model <- function(model, round_digts = 4,tidy_function = "tidy", output_function = "data_table") {
 
   # Get the tidy model object
-  tidy_model <- tidy(model)
+  tidy_function_matched  =  match.fun(tidy_function)
+  tidy_model <- tidy_function_matched(model)
 
   # Convert the tidy model object to a data.table
   setDT(tidy_model)
@@ -36,7 +37,8 @@ DT_tidy_model <- function(model, round_digts = 4, output_function = "data_table"
     names()
 
   # Round the numeric columns to the specified number of digits
-  tidy_model[, (num_nms) := lapply(.SD, round, digits = round_digts), .SDcols = is.numeric]
+  round_all_num_cols(tidy_model, round_digits = round_digts)
+  #tidy_model[, (num_nms) := lapply(.SD, round, digits = round_digts), .SDcols = is.numeric]
 
   # Return the data.table
   output_function_matched  =  match.fun(output_function)

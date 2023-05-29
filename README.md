@@ -44,6 +44,7 @@ anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
                 family = gaussian, data = anorexia)
 
 library(knitr)
+library(broom)
 DT_tidy_model(anorex.1, output_function = "kable")
 ```
 
