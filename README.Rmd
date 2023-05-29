@@ -47,6 +47,8 @@ data_table(iris_head)
 
 ## Produce nice Rmarkdowns tables from model objects
 
+### Tidy summary results
+
 ```{r}
 library(MASS)
 data(anorexia)
@@ -57,5 +59,13 @@ anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
 library(knitr)
 library(broom)
 DT_tidy_model(anorex.1, output_function = "kable")
+```
+
+### Tidy glance results
+
+```{r}
+DT_tidy_model(anorex.1,
+              tidy_function ="glance" ,
+              output_function = "kable")
 ```
 

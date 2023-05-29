@@ -36,6 +36,8 @@ data_table(iris_head)
 
 ## Produce nice Rmarkdowns tables from model objects
 
+### Tidy summary results
+
 ``` r
 library(MASS)
 data(anorexia)
@@ -54,3 +56,15 @@ DT_tidy_model(anorex.1, output_function = "kable")
 | Prewt       |  -0.5655 |    0.1612 |   -3.5087 |  0.0008 |
 | TreatCont   |  -4.0971 |    1.8935 |   -2.1638 |  0.0340 |
 | TreatFT     |   4.5631 |    2.1333 |    2.1389 |  0.0360 |
+
+### Tidy glance results
+
+``` r
+DT_tidy_model(anorex.1,
+              tidy_function ="glance" ,
+              output_function = "kable")
+```
+
+| null.deviance | df.null |    logLik |      AIC |      BIC | deviance | df.residual | nobs |
+|--------------:|--------:|----------:|---------:|---------:|---------:|------------:|-----:|
+|      4525.386 |      71 | -239.9866 | 489.9733 | 501.3566 | 3311.263 |          68 |   72 |
