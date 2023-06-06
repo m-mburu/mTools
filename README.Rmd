@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of mTools is to make my work easier 
+mTools a collection of function I regularly use.
 
 ## Installation
 
