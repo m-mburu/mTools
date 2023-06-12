@@ -4,13 +4,17 @@
 \alias{data_table}
 \title{Title Custom function for datatables}
 \usage{
-data_table(df)
+data_table(df, pageLength = 50)
 }
 \arguments{
 \item{df}{A data frame}
+
+\item{pageLength}{An integer, number of rows displayed}
 }
 \value{
 a an object of class DT
+
+Object of class DT
 }
 \description{
 Description A function to produce beautiful tables

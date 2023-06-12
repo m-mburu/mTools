@@ -6,17 +6,20 @@
 #' 
 #' @return a an object of class DT
 #' @param df A data frame 
+#' @param pageLength An integer, number of rows displayed
 #' @importFrom DT datatable
 #' @export
+#' @return Object of class DT
 #' @examples
 #' iris_head  <- head(iris)
 #' data_table(iris_head)
-data_table <- function(df){
+data_table <- function(df, pageLength = 50){
   n_col = ncol(df)-1
   datatable(df,
             rownames = FALSE,
             style = "bootstrap4", class = 'cell-border stripe',
             options = list(scrollX = TRUE,
+                           pageLength = pageLength,
                            columnDefs = list(list(className = 'dt-center', targets = 0:n_col))
             )
   )
