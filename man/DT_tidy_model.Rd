@@ -9,7 +9,12 @@ DT_tidy_model(
   model,
   round_digts = 4,
   tidy_function = "tidy",
-  output_function = "data_table"
+  output_function = "data_table",
+  coefficient_name = "estimate",
+  coefficient_name_new = NULL,
+  exp_estimate = FALSE,
+  coefficient_ci = FALSE,
+  confint_level = 0.95
 )
 }
 \arguments{
@@ -20,9 +25,19 @@ DT_tidy_model(
 \item{tidy_function}{a function that returns tibble, data frame from a model object eg tidy, glance functions from broom}
 
 \item{output_function}{A string specifying the output function to use. Default is "data_table".}
+
+\item{coefficient_name}{The name of the column with coeffcients}
+
+\item{coefficient_name_new}{In case you want a custom name for your coefficient eg ODDS Ratio 95\%CI}
+
+\item{exp_estimate}{in case you have logistic regression and you want odds ratio}
+
+\item{coefficient_ci}{whether to add coefficent CI}
+
+\item{confint_level}{Confidence level to be used}
 }
 \value{
-An object of class DT, representing the formatted data table.
+An object of class output_function, ie kable, DT etc representing the formatted data table.
 }
 \description{
 Title  Produce a nice data table from tidy model object
@@ -30,12 +45,21 @@ Description This function takes a tidy model object and converts it into a forma
 }
 \examples{
 ## model from glm examples
+data("diabetes")
 library(MASS)
-data(anorexia)
+library(knitr)
 library(broom)
-anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
-                family = gaussian, data = anorexia)
+model <- glm(Outcome ~ .,
+             family = binomial(),
+             data = diabetes)
 
 
-DT_tidy_model(anorex.1)
+DT_tidy_model(model, round_digts = 4,
+              tidy_function = "tidy", 
+              output_function = "kable", 
+              coefficient_name = "estimate",
+              coefficient_name_new = "ODDS Ratio 95\% CI",
+              exp_estimate = TRUE, 
+              coefficient_ci= TRUE,
+              confint_level = .95)
 }

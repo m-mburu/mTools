@@ -50,21 +50,29 @@ data_table(iris_head)
 ### Tidy summary results
 
 ```{r}
+data("diabetes")
 library(MASS)
-data(anorexia)
-
-anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
-                family = gaussian, data = anorexia)
-
 library(knitr)
 library(broom)
-DT_tidy_model(anorex.1, output_function = "kable")
+model <- glm(Outcome ~ .,
+             family = binomial(),
+             data = diabetes)
+
+
+DT_tidy_model(model, round_digts = 2,
+              tidy_function = "tidy", 
+              output_function = "kable", 
+              coefficient_name = "estimate",
+              coefficient_name_new = "ODDS Ratio 95% CI",
+              exp_estimate = TRUE, 
+              coefficient_ci= TRUE,
+              confint_level = .95)
 ```
 
 ### Tidy glance results
 
-```{r}
-DT_tidy_model(anorex.1,
+```{r, eval=T}
+DT_tidy_model(model,
               tidy_function ="glance" ,
               output_function = "kable")
 ```

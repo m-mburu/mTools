@@ -80,6 +80,23 @@ round_all_num_cols(iris) %>%
   
 
   
+  
+
+# combine_conf_intervals
+
+    
+
+  
+
+```{r example-combine_conf_intervals}
+
+combine_conf_intervals(0.5, 0.4, 0.6)
+
+```
+
+  
+
+  
 
 # DT_tidy_model
 
@@ -89,14 +106,23 @@ round_all_num_cols(iris) %>%
 
 ```{r example-DT_tidy_model}
 ## model from glm examples
+data("diabetes")
 library(MASS)
-data(anorexia)
+library(knitr)
 library(broom)
-anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
-                family = gaussian, data = anorexia)
+model <- glm(Outcome ~ .,
+             family = binomial(),
+             data = diabetes)
 
 
-DT_tidy_model(anorex.1)
+DT_tidy_model(model, round_digts = 4,
+              tidy_function = "tidy", 
+              output_function = "kable", 
+              coefficient_name = "estimate",
+              coefficient_name_new = "ODDS Ratio 95% CI",
+              exp_estimate = TRUE, 
+              coefficient_ci= TRUE,
+              confint_level = .95)
 ```
 
   

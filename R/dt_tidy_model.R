@@ -6,43 +6,94 @@
 #' @param round_digts An integer specifying the number of digits to round the numeric columns. Default is 4.
 #' @param output_function A string specifying the output function to use. Default is "data_table".
 #' @param tidy_function a function that returns tibble, data frame from a model object eg tidy, glance functions from broom 
+#' @param coefficient_name  The name of the column with coeffcients 
+#' @param coefficient_name_new  In case you want a custom name for your coefficient eg ODDS Ratio 95%CI
+#' @param exp_estimate in case you have logistic regression and you want odds ratio 
+#' @param confint_level Confidence level to be used 
+#' @param coefficient_ci whether to add coefficent CI
 #' @importFrom broom tidy
-#' @importFrom data.table setDT
-#' @importFrom data.table setDF
+#' @importFrom stats confint coef
+#' @importFrom data.table setDT setnames
 #'
-#' @return An object of class DT, representing the formatted data table.
+#' @return An object of class output_function, ie kable, DT etc representing the formatted data table.
 #'
 #' @export
 #' @examples
 #' ## model from glm examples
+#' data("diabetes")
 #' library(MASS)
-#' data(anorexia)
+#' library(knitr)
 #' library(broom)
-#' anorex.1 <- glm(Postwt ~ Prewt + Treat + offset(Prewt),
-#'                 family = gaussian, data = anorexia)
+#' model <- glm(Outcome ~ .,
+#'              family = binomial(),
+#'              data = diabetes)
 #' 
 #' 
-#' DT_tidy_model(anorex.1)
-DT_tidy_model <- function(model, round_digts = 4,tidy_function = "tidy", output_function = "data_table") {
-
+#' DT_tidy_model(model, round_digts = 4,
+#'               tidy_function = "tidy", 
+#'               output_function = "kable", 
+#'               coefficient_name = "estimate",
+#'               coefficient_name_new = "ODDS Ratio 95% CI",
+#'               exp_estimate = TRUE, 
+#'               coefficient_ci= TRUE,
+#'               confint_level = .95)
+DT_tidy_model <- function(model, round_digts = 4,
+                          tidy_function = "tidy", 
+                          output_function = "data_table", 
+                          coefficient_name = "estimate",
+                          coefficient_name_new = NULL,
+                          exp_estimate = FALSE, 
+                          coefficient_ci = FALSE,
+                          confint_level = .95) {
+  
   # Get the tidy model object
   tidy_function_matched  =  match.fun(tidy_function)
   tidy_model <- tidy_function_matched(model)
-
+  
   # Convert the tidy model object to a data.table
   setDT(tidy_model)
-
+  
+  if(coefficient_ci){
+    
+    nms_cv = c("lower", "upper")
+    
+    tidy_model[,(nms_cv) :=  as.data.frame(confint(model, level = confint_level))]
+  }
+  
+  
+  
+  
+  if(exp_estimate){
+    
+    tidy_model[,  (coefficient_name) := exp(coef(model))]
+    
+    if(coefficient_ci){
+      tidy_model[, (nms_cv) := lapply(.SD, exp), .SDcols = nms_cv]
+    }
+  }
   # Get the names of the numeric columns
   num_nms <- tidy_model[, .SD, .SDcols = is.numeric] |>
     names()
-
+  
   # Round the numeric columns to the specified number of digits
   round_all_num_cols(tidy_model, round_digits = round_digts)
-  #tidy_model[, (num_nms) := lapply(.SD, round, digits = round_digts), .SDcols = is.numeric]
-
+  
+  if(coefficient_ci){
+    
+    tidy_model[, (coefficient_name)  := combine_conf_intervals(get(coefficient_name), lower, upper)]
+    tidy_model[, (nms_cv) := NULL]
+  }
+  if(!is.null(coefficient_name_new)){
+    
+    stopifnot("coefficient_name_new must be a string" = is.character(coefficient_name_new))
+    
+    setnames(tidy_model,
+             coefficient_name, 
+             coefficient_name_new )
+  }
   # Return the data.table
   output_function_matched  =  match.fun(output_function)
-
+  
   output_function_matched(tidy_model)
 }
 
