@@ -4,6 +4,8 @@
 # mTools
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/m-mburu/mTools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/m-mburu/mTools/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 mTools a collection of function I regularly use.
